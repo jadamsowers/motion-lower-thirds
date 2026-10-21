@@ -147,6 +147,12 @@ def square_logo(dst):
     crop.resize((1000, 1000), Image.LANCZOS).save(dst)
 
 
+def media_name(g):
+    """Media file for a graphic. Keep these names stable: FCP caches templates while
+    it's running, and a renamed file makes that layer silently disappear."""
+    return g.get("file") or re.sub(r"\W+", "_", g["name"].lower()) + ".png"
+
+
 # ---------------- XML helpers ----------------
 def node_span(s, node_id):
     m = re.search(rf'<scenenode name="[^"]*" id="{node_id}" factoryID="\d+" version="5">', s)
@@ -295,7 +301,7 @@ VARIANTS = [
             COUNCIL_ID: ("ProximaNova-Semibold", 44, -840, WHITE, (22, 40), (248, 260), "VIRGINIA HEADWATERS COUNCIL"),
         },
         graphics=[
-            dict(name="Red Band", w=1340, h=68, pos=(-1330, -824), timing=(10, 32, 260, 274),
+            dict(name="Red Band", file="band.png", w=1340, h=68, pos=(-1330, -824), timing=(10, 32, 260, 274),
                  draw=dict(fill=RED, slant=20)),
             dict(name="Plate", w=1720, h=320, pos=(-1330, -630), timing=(6, 30, 264, 278),
                  draw=dict(fill=NAVY, gradient=NAVY_HI, alpha=245, slant=90, tab=(22, 26, SKY))),
@@ -371,7 +377,7 @@ def build(v, base_xml, logo_png):
     # graphics behind text; Motion stacks the first XML child frontmost
     nodes, clips = "", ""
     for i, g in enumerate(v["graphics"]):
-        fn = re.sub(r"\W+", "_", g["name"].lower()) + ".png"
+        fn = media_name(g)
         shape_png(d / "Media" / fn, g["w"], g["h"], **g["draw"])
         nid, cid = 1999100001 + i, 1999100101 + i
         i0, i1, o0, o1 = g["timing"]
@@ -408,7 +414,7 @@ def thumbnail(v, d):
     X = lambda x: int(W / 2 + x)
     Y = lambda y: int(H / 2 - y)
     for g in reversed(v["graphics"]):
-        fn = re.sub(r"\W+", "_", g["name"].lower()) + ".png"
+        fn = media_name(g)
         img = Image.open(d / "Media" / fn)
         im.alpha_composite(img, (X(g["pos"][0]) - img.width // 2, Y(g["pos"][1]) - img.height // 2))
     (lx, ly), sc = v["logo"]
