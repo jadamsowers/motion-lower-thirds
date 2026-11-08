@@ -19,6 +19,20 @@ Every template has:
 - Build In / Build Out markers, so FCP only stretches the hold when you trim
 - 4K / 59.94 fps, with brand colors navy `#002F6E`, sky `#2C8FE0`, red `#CC122E`
 
+## Installing the prebuilt templates
+
+Built templates are checked in under `templates/VAHC/`. To use them without running the script,
+copy that folder into Motion's Titles folder, then restart Final Cut Pro:
+
+```sh
+cp -R templates/VAHC ~/Movies/"Motion Templates.localized/Titles.localized/"
+```
+
+`templates/VAHC/FOS 27 lower third/` is the original template the script builds from. Pass it as
+`--base` if the FOS 27 files aren't already in your Motion library. These copies are not updated
+automatically. After regenerating, copy the output back into `templates/VAHC/`, or run with
+`--out templates/VAHC`.
+
 ## How it works
 
 Hand-built Motion XML is fragile, so the script starts from a working `.moti` (the original
