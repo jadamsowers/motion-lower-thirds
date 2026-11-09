@@ -1,15 +1,21 @@
 # motion-lower-thirds
 
-Generates branded, animated lower-third title templates for Apple Motion / Final Cut Pro
-(built for the VAHC FOS 27 campaign).
+Generates branded, animated lower-third title templates for Apple Motion / Final Cut Pro.
+Each brand (logo, colors, council line) lives in its own folder under `brands/`, so the same
+three layouts can be built for any program or campaign.
 
-It writes three templates into Motion's Titles folder (`Titles → VAHC` in Final Cut):
+For a brand named `NYLT`, it writes three templates into Motion's Titles folder:
 
 | Template | Look |
 |---|---|
-| FOS 27 lower third Pro | Navy plate with slanted end + sky tab, red council band |
-| FOS 27 lower third Bar | Full-width navy band, red top stripe, red council tab |
-| FOS 27 lower third Stacked | Navy name strip / white title strip / sky council strip |
+| NYLT lower third Pro | Plate with slanted end + accent tab, council band |
+| NYLT lower third Bar | Full-width plate band, top stripe, council tab |
+| NYLT lower third Stacked | Plate name strip / white title strip / accent council strip |
+
+Each also gets a **Vertical** copy (`NYLT lower third Pro Vertical`, …) on a 2160×3840 (9:16)
+canvas for Shorts, Reels and TikTok. It's the same design, kept clear of the button column
+those apps draw down the right ~220 px, and sitting ~580 px (15%) above the bottom edge. Use the
+vertical copies in vertical projects and the regular ones in 16:9 projects.
 
 Every template has:
 
@@ -17,21 +23,99 @@ Every template has:
   Images are fit (not cropped) into a square box.
 - a fast staggered build-in/out (logo pops with overshoot, plates wipe from the left, text slides in)
 - Build In / Build Out markers, so FCP only stretches the hold when you trim
-- 4K / 59.94 fps, with brand colors navy `#002F6E`, sky `#2C8FE0`, red `#CC122E`
+- 4K / 59.94 fps
 
-## Installing the prebuilt templates
+## Using the templates in Final Cut Pro (no Motion needed)
 
-Built templates are checked in under `templates/VAHC/`. To use them without running the script,
-copy that folder into Motion's Titles folder, then restart Final Cut Pro:
+Final Cut Pro uses these template folders directly. You don't need Motion, Python, or anything
+else in this repo; Motion is only needed to change the design itself.
 
-```sh
-cp -R templates/VAHC ~/Movies/"Motion Templates.localized/Titles.localized/"
+1. **Install Proxima Nova** (Bold, Semibold and Medium), for example from Adobe Fonts. Without it,
+   Final Cut shows the text in Helvetica Regular, and it can't be told to use another font instead.
+2. **Download the templates.** On this repo's GitHub page, click **Code → Download ZIP** and unzip
+   it. The templates are in the `templates` folder: `NYLT` and `VAHC` (FOS 27).
+3. **Open Final Cut's titles folder.** In Finder, choose **Go → Go to Folder…** and enter
+   `~/Movies/Motion Templates.localized/Titles.localized`. If Finder says it doesn't exist, open
+   your Movies folder and create a folder named `Motion Templates.localized` with a folder named
+   `Titles.localized` inside it. Finder may show them as "Motion Templates" and "Titles".
+4. **Copy in a brand folder** (for example `NYLT`, the whole folder) and restart Final Cut Pro.
+   The titles appear in the Titles and Generators sidebar under **Titles → NYLT**.
+
+Use the regular templates in 16:9 projects and the **Vertical** ones in 9:16 projects.
+
+**Editing in Final Cut:**
+
+- **Text:** select the title in the timeline and double-click the Name, Title or council line in
+  the viewer to type over it, or edit it in the Text Inspector.
+- **Logo:** in the Title Inspector, the **Logo** drop zone holds the image. Click the drop zone
+  well, select a still or clip in the browser, and click **Apply Clip**. Images are fit into a
+  square, so round logos work best.
+
+## Previews
+
+Mockups of the current builds (drawn by the script, not rendered by Motion), from `previews/`:
+
+| | NYLT | FOS 27 |
+|---|---|---|
+| Pro | ![](previews/nylt/pro.png) | ![](previews/fos27/pro.png) |
+| Bar | ![](previews/nylt/bar.png) | ![](previews/fos27/bar.png) |
+| Stacked | ![](previews/nylt/stacked.png) | ![](previews/fos27/stacked.png) |
+| Pro Vertical | ![](previews/nylt/pro-vertical.png) | ![](previews/fos27/pro-vertical.png) |
+| Bar Vertical | ![](previews/nylt/bar-vertical.png) | ![](previews/fos27/bar-vertical.png) |
+| Stacked Vertical | ![](previews/nylt/stacked-vertical.png) | ![](previews/fos27/stacked-vertical.png) |
+
+## Brands
+
+| Folder | Templates | Final Cut category |
+|---|---|---|
+| `brands/nylt` | NYLT lower third … | Titles → NYLT |
+| `brands/fos27` | FOS 27 lower third … (VAHC Friends of Scouting 2027) | Titles → VAHC |
+
+Each brand folder holds a logo and a `brand.toml`:
+
+```toml
+name = "NYLT"                          # template names: "NYLT lower third Pro", ...
+category = "NYLT"                      # Final Cut category (defaults to name)
+council = "VIRGINIA HEADWATERS COUNCIL"
+logo = "logo.jpg"                      # round logo on white or transparent
+
+[colors]
+plate = "#023876"       # plates and bars
+plate_hi = "#0E4E96"    # top of the plate gradient (a little lighter than plate)
+accent = "#005E9E"      # Pro tab, Stacked council strip
+band = "#ED1848"        # council band, stripes
+title_text = "#A9B8E0"  # Title line on the plate (keep it light)
 ```
 
-`templates/VAHC/FOS 27 lower third/` is the original template the script builds from. Pass it as
-`--base` if the FOS 27 files aren't already in your Motion library. These copies are not updated
-automatically. After regenerating, copy the output back into `templates/VAHC/`, or run with
-`--out templates/VAHC`.
+**Adding a brand:** copy an existing folder (`cp -R brands/nylt brands/newthing`), drop in the
+new logo, edit `brand.toml`, then build it. Use a round logo: the script cuts the logo into a
+circle, sized from its widest point across the middle.
+
+## Usage
+
+```sh
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/python lowerthirds.py nylt              # build one brand straight into Final Cut
+.venv/bin/python lowerthirds.py nylt fos27        # several brands
+.venv/bin/python lowerthirds.py all               # every brand in brands/
+.venv/bin/python lowerthirds.py nylt --out templates   # build into the repo instead
+.venv/bin/python lowerthirds.py --help
+```
+
+By default, templates go into `~/Movies/Motion Templates.localized/Titles.localized/<category>/`.
+Restart Final Cut Pro afterwards so it picks them up. Previews are written to `previews/<brand>/`
+and checked in, so commit them along with any rebuilt templates.
+
+**Close the templates in Motion before re-running.** The script replaces the output folders, and
+saving a stale copy from Motion would undo the rebuild.
+
+## Prebuilt templates
+
+Built copies are checked in under `templates/<category>/` (see
+[Using the templates in Final Cut Pro](#using-the-templates-in-final-cut-pro-no-motion-needed)).
+They are not updated automatically: rebuild with `--out templates` after a change, and commit the
+templates and `previews/` together. `templates/VAHC/FOS 27 lower third/` is the original template
+every build starts from (the `--base` default), so don't delete it.
 
 ## How it works
 
@@ -46,22 +130,13 @@ Hand-built Motion XML is fragile, so the script starts from a working `.moti` (t
 Each graphic PNG is twice its visible width and transparent on the left half. That puts the
 layer's center on its left edge, so a scale-X wipe grows from the left without an anchor point.
 
-## Usage
+## Customizing layouts
 
-```sh
-python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python lowerthirds.py            # defaults use the FOS 27 files on this Mac
-.venv/bin/python lowerthirds.py --help     # override base template, output dir, logo, font
-```
-
-Previews are written to `previews/`. **Close the templates in Motion before re-running.** The
-script replaces the output folders, and saving a stale copy from Motion would undo the rebuild.
-
-## Customizing
-
-All layouts live in the `VARIANTS` list in `lowerthirds.py`:
+The three layouts live in `variants()` in `lowerthirds.py`:
 
 - positions use Motion canvas coordinates (origin at center, +Y up, 3840×2160)
 - `timing` is `(in start, in end, out start, out end)` in frames
 - keep every out animation at or after `BUILD_OUT` (frame 246)
-- the brand colors are constants at the top of the file
+- colors come from the brand's `brand.toml`
+- `vertical()` derives the 9:16 copies: `V_DX` / `V_DY` shift each layout, `V_RIGHT` caps plate
+  width, and full-width bars are narrowed to the vertical frame
