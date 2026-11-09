@@ -25,6 +25,32 @@ Every template has:
 - Build In / Build Out markers, so FCP only stretches the hold when you trim
 - 4K / 59.94 fps
 
+## Using the templates in Final Cut Pro (no Motion needed)
+
+Final Cut Pro uses these template folders directly. You don't need Motion, Python, or anything
+else in this repo; Motion is only needed to change the design itself.
+
+1. **Install Proxima Nova** (Bold, Semibold and Medium), for example from Adobe Fonts. Without it,
+   Final Cut shows the text in Helvetica Regular, and it can't be told to use another font instead.
+2. **Download the templates.** On this repo's GitHub page, click **Code → Download ZIP** and unzip
+   it. The templates are in the `templates` folder: `NYLT` and `VAHC` (FOS 27).
+3. **Open Final Cut's titles folder.** In Finder, choose **Go → Go to Folder…** and enter
+   `~/Movies/Motion Templates.localized/Titles.localized`. If Finder says it doesn't exist, open
+   your Movies folder and create a folder named `Motion Templates.localized` with a folder named
+   `Titles.localized` inside it. Finder may show them as "Motion Templates" and "Titles".
+4. **Copy in a brand folder** (for example `NYLT`, the whole folder) and restart Final Cut Pro.
+   The titles appear in the Titles and Generators sidebar under **Titles → NYLT**.
+
+Use the regular templates in 16:9 projects and the **Vertical** ones in 9:16 projects.
+
+**Editing in Final Cut:**
+
+- **Text:** select the title in the timeline and double-click the Name, Title or council line in
+  the viewer to type over it, or edit it in the Text Inspector.
+- **Logo:** in the Title Inspector, the **Logo** drop zone holds the image. Click the drop zone
+  well, select a still or clip in the browser, and click **Apply Clip**. Images are fit into a
+  square, so round logos work best.
+
 ## Previews
 
 Mockups of the current builds (drawn by the script, not rendered by Motion), from `previews/`:
@@ -85,16 +111,11 @@ saving a stale copy from Motion would undo the rebuild.
 
 ## Prebuilt templates
 
-Built copies are checked in under `templates/<category>/`. To install them without running the
-script, copy the folder into Motion's Titles folder, then restart Final Cut Pro:
-
-```sh
-cp -R templates/NYLT ~/Movies/"Motion Templates.localized/Titles.localized/"
-```
-
-These copies are not updated automatically: rebuild with `--out templates` after a change.
-`templates/VAHC/FOS 27 lower third/` is the original template every build starts from (the
-`--base` default), so don't delete it.
+Built copies are checked in under `templates/<category>/` (see
+[Using the templates in Final Cut Pro](#using-the-templates-in-final-cut-pro-no-motion-needed)).
+They are not updated automatically: rebuild with `--out templates` after a change, and commit the
+templates and `previews/` together. `templates/VAHC/FOS 27 lower third/` is the original template
+every build starts from (the `--base` default), so don't delete it.
 
 ## How it works
 
