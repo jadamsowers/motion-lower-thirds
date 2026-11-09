@@ -1,39 +1,51 @@
-"""Build the FOS 27 lower-third family from the user's original .moti.
+"""Build a branded lower-third family from the original FOS 27 .moti.
 
 Every variant: drop-zone logo (published as "Logo" so it can be swapped in FCP),
 snappy keyframed build in/out, Build In/Out markers, thumbnails.
 
-Usage: python lowerthirds.py [--base X.moti] [--out DIR] [--logo PNG] [--font TTF]
-(defaults point at the FOS 27 files on this Mac; see README)
+Usage: python lowerthirds.py BRAND [BRAND ...] [--out DIR] [--base X.moti] [--font TTF]
+Each brand is a folder in brands/ with a brand.toml and its logo; see README.
 """
 import argparse
+import copy
 import re
 import shutil
+import tomllib
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFont
 
 HOME = Path.home()
-TITLES = HOME / "Movies/Motion Templates.localized/Titles.localized/VAHC"
+REPO = Path(__file__).parent
+BRANDS = sorted(p.parent.name for p in (REPO / "brands").glob("*/brand.toml"))
 ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-ap.add_argument("--base", default=str(TITLES / "FOS 27 lower third/FOS 27 lower third.moti"),
+ap.add_argument("brands", nargs="+", metavar="BRAND", choices=BRANDS + ["all"],
+                help=f"brand folder(s) in brands/, or all ({', '.join(BRANDS)})")
+ap.add_argument("--out", default=str(HOME / "Movies/Motion Templates.localized/Titles.localized"),
+                help="Motion Titles folder; each brand goes in its category subfolder")
+ap.add_argument("--base", default=str(REPO / "templates/VAHC/FOS 27 lower third/FOS 27 lower third.moti"),
                 help="original .moti whose text layers are reused")
-ap.add_argument("--out", default=str(TITLES), help="Motion Titles folder to write the templates into")
-ap.add_argument("--logo", default=str(HOME / "Downloads/FOS 27 round logo.png"),
-                help="default logo (on a white background) for the drop zone")
 ap.add_argument("--font", default="/System/Library/PrivateFrameworks/Slideshows.framework/Versions/A/Resources/Content/Fonts/Proxima Nova Bold.ttf",
                 help="font used only for drawing thumbnails")
 ARGS = ap.parse_args()
-SRC, OUT_DIR, LOGO_PNG, FONT = ARGS.base, Path(ARGS.out), ARGS.logo, ARGS.font
-PREVIEWS = Path(__file__).parent / "previews"
+SRC, OUT_ROOT, FONT = ARGS.base, Path(ARGS.out), ARGS.font
+PREVIEWS = REPO / "previews"
 
 # ---------------- brand ----------------
-NAVY = (0, 47, 110)
-NAVY_HI = (10, 64, 140)
-SKY = (44, 143, 224)
-RED = (204, 18, 46)
 WHITE = (255, 255, 255)
-LIGHT_SKY = (156, 203, 242)
+COLOR_KEYS = ("plate", "plate_hi", "accent", "band", "title_text")
+
+
+def load_brand(bid):
+    d = REPO / "brands" / bid
+    b = tomllib.loads((d / "brand.toml").read_text(encoding="utf-8"))
+    b["id"], b["logo"] = bid, d / b["logo"]
+    b.setdefault("category", b["name"])
+    missing = set(COLOR_KEYS) - set(b["colors"])
+    assert not missing, f"{bid}: brand.toml is missing colors {sorted(missing)}"
+    b["colors"] = {k: tuple(int(v.lstrip("#")[i:i + 2], 16) for i in (0, 2, 4)) for k, v in b["colors"].items()}
+    return b
+
 
 FPS_UNITS = 2002  # one frame at 59.94 in a 120000 timescale
 END = 300
@@ -128,9 +140,12 @@ def shape_png(path, w, h, fill, alpha=255, slant=0, gradient=None, tab=None, lef
     im.resize((2 * w, h), Image.LANCZOS).save(path)
 
 
-def square_logo(dst):
+def square_logo(logo, dst):
     """Default drop-zone image: the round logo cut out on a transparent square."""
-    src = Image.open(LOGO_PNG).convert("RGB")
+    src = Image.open(logo).convert("RGBA")
+    flat = Image.new("RGBA", src.size, WHITE + (255,))
+    flat.alpha_composite(src)
+    src = flat.convert("RGB")
     px = src.load()
     W, H = src.size
     cy = H // 2
@@ -290,70 +305,110 @@ def clip(name, cid, rel, w, h):
 
 # ---------------- variants ----------------
 # graphics: front-to-back. pos = (left edge x, center y). wipe/op = (in f0, in f1, out f0, out f1)
-VARIANTS = [
-    dict(
-        title="FOS 27 lower third Pro",
-        logo=((-1330, -664), 0.44),
-        text_x=-1050,
-        text={
-            NAME_ID: ("ProximaNova-Bold", 150, -620, WHITE, (14, 34), (250, 262), None),
-            TITLE_ID: ("ProximaNova-Medium", 80, -735, LIGHT_SKY, (18, 38), (252, 264), None),
-            COUNCIL_ID: ("ProximaNova-Semibold", 44, -840, WHITE, (22, 40), (248, 260), "VIRGINIA HEADWATERS COUNCIL"),
-        },
-        graphics=[
-            dict(name="Red Band", file="band.png", w=1340, h=68, pos=(-1330, -824), timing=(10, 32, 260, 274),
-                 draw=dict(fill=RED, slant=20)),
-            dict(name="Plate", w=1720, h=320, pos=(-1330, -630), timing=(6, 30, 264, 278),
-                 draw=dict(fill=NAVY, gradient=NAVY_HI, alpha=245, slant=90, tab=(22, 26, SKY))),
-        ],
-    ),
-    dict(
-        title="FOS 27 lower third Bar",
-        logo=((-1330, -665), 0.40),
-        text_x=-1060,
-        text={
-            NAME_ID: ("ProximaNova-Bold", 130, -715, WHITE, (14, 34), (250, 262), None),
-            TITLE_ID: ("ProximaNova-Medium", 72, -810, LIGHT_SKY, (18, 38), (252, 264), None),
-            COUNCIL_ID: ("ProximaNova-Semibold", 38, -572, WHITE, (24, 40), (248, 258), "VIRGINIA HEADWATERS COUNCIL"),
-        },
-        graphics=[
-            dict(name="Council Tab", w=820, h=62, pos=(-1080, -559), timing=(16, 34, 256, 268),
-                 draw=dict(fill=RED, slant=22)),
-            dict(name="Red Stripe", w=3840, h=10, pos=(-1920, -595), timing=(4, 26, 262, 276),
-                 draw=dict(fill=RED)),
-            dict(name="Bar", w=3840, h=250, pos=(-1920, -725), timing=(6, 30, 264, 278),
-                 draw=dict(fill=NAVY, gradient=NAVY_HI, alpha=240)),
-        ],
-    ),
-    dict(
-        title="FOS 27 lower third Stacked",
-        logo=((-1330, -658), 0.40),
-        text_x=-1060,
-        text={
-            NAME_ID: ("ProximaNova-Bold", 140, -620, WHITE, (14, 34), (250, 262), None),
-            TITLE_ID: ("ProximaNova-Semibold", 72, -748, NAVY, (20, 38), (252, 264), None),
-            COUNCIL_ID: ("ProximaNova-Semibold", 38, -822, WHITE, (24, 40), (248, 260), "VIRGINIA HEADWATERS COUNCIL"),
-        },
-        graphics=[
-            dict(name="Sky Strip", w=900, h=56, pos=(-1150, -808), timing=(14, 34, 256, 270),
-                 draw=dict(fill=SKY)),
-            dict(name="White Plate", w=1180, h=110, pos=(-1150, -725), timing=(10, 32, 260, 274),
-                 draw=dict(fill=WHITE, alpha=245)),
-            dict(name="Navy Plate", w=1560, h=190, pos=(-1150, -575), timing=(6, 30, 264, 278),
-                 draw=dict(fill=NAVY, gradient=NAVY_HI, alpha=245, tab=(0, 18, RED))),
-        ],
-    ),
-]
+def variants(b):
+    c, council = b["colors"], b["council"]
+    return [
+        dict(
+            title=f"{b['name']} lower third Pro",
+            logo=((-1330, -664), 0.44),
+            text_x=-1050,
+            text={
+                NAME_ID: ("ProximaNova-Bold", 150, -620, WHITE, (14, 34), (250, 262), None),
+                TITLE_ID: ("ProximaNova-Medium", 80, -735, c["title_text"], (18, 38), (252, 264), None),
+                COUNCIL_ID: ("ProximaNova-Semibold", 44, -840, WHITE, (22, 40), (248, 260), council),
+            },
+            graphics=[
+                dict(name="Red Band", file="band.png", w=1340, h=68, pos=(-1330, -824), timing=(10, 32, 260, 274),
+                     draw=dict(fill=c["band"], slant=20)),
+                dict(name="Plate", w=1720, h=320, pos=(-1330, -630), timing=(6, 30, 264, 278),
+                     draw=dict(fill=c["plate"], gradient=c["plate_hi"], alpha=245, slant=90, tab=(22, 26, c["accent"]))),
+            ],
+        ),
+        dict(
+            title=f"{b['name']} lower third Bar",
+            logo=((-1330, -665), 0.40),
+            text_x=-1060,
+            text={
+                NAME_ID: ("ProximaNova-Bold", 130, -715, WHITE, (14, 34), (250, 262), None),
+                TITLE_ID: ("ProximaNova-Medium", 72, -810, c["title_text"], (18, 38), (252, 264), None),
+                COUNCIL_ID: ("ProximaNova-Semibold", 38, -572, WHITE, (24, 40), (248, 258), council),
+            },
+            graphics=[
+                dict(name="Council Tab", w=820, h=62, pos=(-1080, -559), timing=(16, 34, 256, 268),
+                     draw=dict(fill=c["band"], slant=22)),
+                dict(name="Red Stripe", w=3840, h=10, pos=(-1920, -595), timing=(4, 26, 262, 276),
+                     draw=dict(fill=c["band"])),
+                dict(name="Bar", w=3840, h=250, pos=(-1920, -725), timing=(6, 30, 264, 278),
+                     draw=dict(fill=c["plate"], gradient=c["plate_hi"], alpha=240)),
+            ],
+        ),
+        dict(
+            title=f"{b['name']} lower third Stacked",
+            logo=((-1330, -658), 0.40),
+            text_x=-1060,
+            text={
+                NAME_ID: ("ProximaNova-Bold", 140, -620, WHITE, (14, 34), (250, 262), None),
+                TITLE_ID: ("ProximaNova-Semibold", 72, -748, c["plate"], (20, 38), (252, 264), None),
+                COUNCIL_ID: ("ProximaNova-Semibold", 38, -822, WHITE, (24, 40), (248, 260), council),
+            },
+            graphics=[
+                dict(name="Accent Strip", w=900, h=56, pos=(-1150, -808), timing=(14, 34, 256, 270),
+                     draw=dict(fill=c["accent"])),
+                dict(name="White Plate", w=1180, h=110, pos=(-1150, -725), timing=(10, 32, 260, 274),
+                     draw=dict(fill=WHITE, alpha=245)),
+                dict(name="Navy Plate", w=1560, h=190, pos=(-1150, -575), timing=(6, 30, 264, 278),
+                     draw=dict(fill=c["plate"], gradient=c["plate_hi"], alpha=245, tab=(0, 18, c["band"]))),
+            ],
+        ),
+    ]
 
 
-def build(v, base_xml, logo_png):
-    d = OUT_DIR / v["title"]
+# ---------------- vertical (9:16) ----------------
+# A vertical copy of each layout for Shorts/Reels/TikTok: same design on a 2160x3840 canvas,
+# moved in from the left edge and up past the captions and buttons those apps draw over the
+# bottom ~880 px and the right ~220 px.
+V_SIZE = (2160, 3840)
+V_DX, V_DY = 570, -156  # logo ~100 px from the left edge, graphic bottom ~880 px up
+V_RIGHT = 860           # plates stop here, clear of the right-hand button column
+
+
+def vertical(v):
+    v = copy.deepcopy(v)
+    v["title"] += " Vertical"
+    v["size"] = V_SIZE
+    v["preview_crop"] = (0, 2300, 2160, 3200)
+    (lx, ly), sc = v["logo"]
+    v["logo"] = ((lx + V_DX, ly + V_DY), sc)
+    v["text_x"] += V_DX
+    v["text"] = {k: (font, size, y + V_DY, *rest) for k, (font, size, y, *rest) in v["text"].items()}
+    for g in v["graphics"]:
+        x, y = g["pos"]
+        if g["w"] == 3840:  # full-width bar stays full width
+            x, g["w"] = -V_SIZE[0] // 2, V_SIZE[0]
+        else:
+            x += V_DX
+            g["w"] = min(g["w"], V_RIGHT - x)
+        g["pos"] = (x, y + V_DY)
+    return v
+
+
+def set_canvas(s, w, h):
+    s = s.replace("<width>3840</width>\n\t\t<height>2160</height>", f"<width>{w}</width>\n\t\t<height>{h}</height>", 1)
+    for name, pid, val in (("Fixed Width", 302, w), ("Fixed Height", 303, h), ("Aperture Width", 312, w), ("Aperture Height", 313, h)):
+        s, n = re.subn(rf'(<parameter name="{name}" id="{pid}" flags="\d+" default=")\d+(" value=")\d+"', rf'\g<1>{val}\g<2>{val}"', s)
+        assert n == 2, (name, n)  # text group + layer
+    assert f"<width>{w}</width>" in s
+    return s
+
+
+def build(v, base_xml, logo_png, out_dir, previews):
+    d = out_dir / v["title"]
     if d.exists():
         shutil.rmtree(d)
     (d / "Media").mkdir(parents=True)
     shutil.copy(logo_png, d / "Media" / "logo.png")
 
-    s = base_xml
+    s = set_canvas(base_xml, *v.get("size", (3840, 2160)))
     s = re.sub(r"\n\t*<behavior name=\"[^\"]*\" id=\"\d+\" factoryID=\"\d+\">.*?</behavior>", "", s, flags=re.S)
     for nid, spec in v["text"].items():
         s = edit_node(s, nid, text_editor(v["text_x"], spec))
@@ -404,12 +459,12 @@ def build(v, base_xml, logo_png):
         assert must in s, must
     assert s.count('id="16" flags="8589938704"') == 3
     (d / f"{v['title']}.moti").write_text(s, encoding="utf-8")
-    thumbnail(v, d)
+    thumbnail(v, d, previews)
     return d
 
 
-def thumbnail(v, d):
-    W, H = 3840, 2160
+def thumbnail(v, d, previews):
+    W, H = v.get("size", (3840, 2160))
     im = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     X = lambda x: int(W / 2 + x)
     Y = lambda y: int(H / 2 - y)
@@ -421,20 +476,26 @@ def thumbnail(v, d):
     logo = Image.open(d / "Media" / "logo.png").resize((int(1000 * sc),) * 2, Image.LANCZOS)
     im.alpha_composite(logo, (X(lx) - logo.width // 2, Y(ly) - logo.height // 2))
     dr = ImageDraw.Draw(im)
-    labels = {NAME_ID: "Name", TITLE_ID: "Title", COUNCIL_ID: "VIRGINIA HEADWATERS COUNCIL"}
+    labels = {NAME_ID: "Name", TITLE_ID: "Title", COUNCIL_ID: v["text"][COUNCIL_ID][-1]}
     for nid, (font, size, y, rgb, *_r) in v["text"].items():
         dr.text((X(v["text_x"]), Y(y)), labels[nid], font=ImageFont.truetype(FONT, size), fill=rgb, anchor="ls")
-    im.resize((640, 360), Image.LANCZOS).save(d / "large.png")
-    im.resize((192, 108), Image.LANCZOS).save(d / "small.png")
+    im.resize((W // 6, H // 6), Image.LANCZOS).save(d / "large.png")
+    im.resize((W // 20, H // 20), Image.LANCZOS).save(d / "small.png")
     bg = Image.new("RGBA", (W, H), (70, 90, 80, 255))
     bg.alpha_composite(im)
-    bg.crop((0, 1200, 2600, 2160)).resize((1300, 480), Image.LANCZOS).save(PREVIEWS / f"{v['title'].split()[-1].lower()}.png")
+    crop = bg.crop(v.get("preview_crop", (0, 1200, 2600, 2160)))
+    slug = v["title"].split("lower third ")[-1].lower().replace(" ", "-")
+    crop.resize((crop.width // 2, crop.height // 2), Image.LANCZOS).save(previews / f"{slug}.png")
 
 
 if __name__ == "__main__":
     base = Path(SRC).read_text(encoding="utf-8")
-    PREVIEWS.mkdir(exist_ok=True)
-    tmp_logo = PREVIEWS / "logo_square.png"
-    square_logo(tmp_logo)
-    for v in VARIANTS:
-        print("built", build(v, base, tmp_logo))
+    for bid in BRANDS if "all" in ARGS.brands else dict.fromkeys(ARGS.brands):
+        brand = load_brand(bid)
+        previews = PREVIEWS / bid
+        previews.mkdir(parents=True, exist_ok=True)
+        logo = previews / "logo_square.png"
+        square_logo(brand["logo"], logo)
+        landscape = variants(brand)
+        for v in landscape + [vertical(v) for v in landscape]:
+            print("built", build(v, base, logo, OUT_ROOT / brand["category"], previews))

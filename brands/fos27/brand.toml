@@ -1,0 +1,12 @@
+# VAHC Friends of Scouting 2027 campaign
+name = "FOS 27"
+category = "VAHC"
+council = "VIRGINIA HEADWATERS COUNCIL"
+logo = "logo.png"
+
+[colors]
+plate = "#002F6E"
+plate_hi = "#0A408C"
+accent = "#2C8FE0"
+band = "#CC122E"
+title_text = "#9CCBF2"

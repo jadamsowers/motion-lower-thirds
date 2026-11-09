@@ -1,0 +1,12 @@
+# NYLT colors sampled from the logo
+name = "NYLT"                          # template names: "NYLT lower third Pro", ...
+category = "NYLT"                      # Final Cut: Titles → NYLT
+council = "VIRGINIA HEADWATERS COUNCIL"
+logo = "logo.jpg"                      # round logo on white or transparent
+
+[colors]
+plate = "#023876"       # navy plates and bars
+plate_hi = "#0E4E96"    # top of the plate gradient
+accent = "#005E9E"      # Pro tab, Stacked council strip
+band = "#ED1848"        # council band, stripes
+title_text = "#A9B8E0"  # Title line on the plate
