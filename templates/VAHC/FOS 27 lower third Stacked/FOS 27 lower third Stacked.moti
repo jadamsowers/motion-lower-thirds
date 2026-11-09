@@ -1112,7 +1112,7 @@
 				<parameter name="Aperture Height" id="313" flags="12884901906" default="2160" value="2160"/>
 			</parameter>
 		</group>
-		<scenenode name="Sky Strip" id="1999100001" factoryID="12" version="5">
+		<scenenode name="Accent Strip" id="1999100001" factoryID="12" version="5">
 <validTracks>1</validTracks>
 <aspectRatio>0</aspectRatio>
 <flags>0</flags>
@@ -1436,8 +1436,8 @@
 	</layer>
 
 	<footage name="Media Layer" id="10006">
-<clip name="Sky Strip" id="1999100101">
-<relativeURL>Media/sky_strip.png</relativeURL>
+<clip name="Accent Strip" id="1999100101">
+<relativeURL>Media/accent_strip.png</relativeURL>
 <missingWidth>1800</missingWidth>
 <missingHeight>56</missingHeight>
 <missingDuration>0.033333333333333333</missingDuration>

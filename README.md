@@ -13,9 +13,9 @@ For a brand named `NYLT`, it writes three templates into Motion's Titles folder:
 | NYLT lower third Stacked | Plate name strip / white title strip / accent council strip |
 
 Each also gets a **Vertical** copy (`NYLT lower third Pro Vertical`, …) on a 2160×3840 (9:16)
-canvas for Shorts, Reels and TikTok. It's the same design, moved up and in so it clears the
-captions and buttons those apps draw over the bottom ~880 px and right ~220 px. Use the vertical
-copies in vertical projects and the regular ones in 16:9 projects.
+canvas for Shorts, Reels and TikTok. It's the same design, kept clear of the button column
+those apps draw down the right ~220 px, and sitting ~580 px (15%) above the bottom edge. Use the
+vertical copies in vertical projects and the regular ones in 16:9 projects.
 
 Every template has:
 

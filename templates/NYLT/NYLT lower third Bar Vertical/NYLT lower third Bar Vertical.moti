@@ -323,7 +323,7 @@
 					<parameter name="Position" id="101" flags="8589938704">
 						<foldFlags>15</foldFlags>
 						<parameter name="X" id="1" flags="8589934608" default="0" value="-760"/>
-						<parameter name="Y" id="2" flags="8589934608" default="0" value="-821"/>
+						<parameter name="Y" id="2" flags="8589934608" default="0" value="-1121"/>
 					</parameter>
 					<parameter name="Scale" id="105" flags="8589938704">
 <foldFlags>15</foldFlags>
@@ -593,7 +593,7 @@
 	<keypoint interpolation="1" flags="0"><time>516516 120000 1 0</time><value>-540</value></keypoint>
 </curve>
 </parameter>
-							<parameter name="Y" id="2" flags="8589934608" default="0" value="-728"/>
+							<parameter name="Y" id="2" flags="8589934608" default="0" value="-1028"/>
 						</parameter>
 					</parameter>
 					<parameter name="Blending" id="200" flags="8589938704">
@@ -789,7 +789,7 @@
 	<keypoint interpolation="1" flags="0"><time>528528 120000 1 0</time><value>-540</value></keypoint>
 </curve>
 </parameter>
-							<parameter name="Y" id="2" flags="8589934608" default="0" value="-966"/>
+							<parameter name="Y" id="2" flags="8589934608" default="0" value="-1266"/>
 						</parameter>
 					</parameter>
 					<parameter name="Blending" id="200" flags="8589938704">
@@ -991,7 +991,7 @@
 	<keypoint interpolation="1" flags="0"><time>524524 120000 1 0</time><value>-540</value></keypoint>
 </curve>
 </parameter>
-							<parameter name="Y" id="2" flags="8589934608" default="0" value="-871"/>
+							<parameter name="Y" id="2" flags="8589934608" default="0" value="-1171"/>
 						</parameter>
 					</parameter>
 					<parameter name="Blending" id="200" flags="8589938704">
@@ -1124,7 +1124,7 @@
 <parameter name="Position" id="101" flags="8589938704">
 <foldFlags>15</foldFlags>
 <parameter name="X" id="1" flags="8589934608" default="0" value="-510"/>
-<parameter name="Y" id="2" flags="8589934608" default="0" value="-715"/>
+<parameter name="Y" id="2" flags="8589934608" default="0" value="-1015"/>
 </parameter>
 <parameter name="Scale" id="105" flags="8589938704">
 <foldFlags>15</foldFlags>
@@ -1213,7 +1213,7 @@
 <parameter name="Position" id="101" flags="8589938704">
 <foldFlags>15</foldFlags>
 <parameter name="X" id="1" flags="8589934608" default="0" value="-1080"/>
-<parameter name="Y" id="2" flags="8589934608" default="0" value="-751"/>
+<parameter name="Y" id="2" flags="8589934608" default="0" value="-1051"/>
 </parameter>
 <parameter name="Scale" id="105" flags="8589938704">
 <foldFlags>15</foldFlags>
@@ -1308,7 +1308,7 @@
 <parameter name="Position" id="101" flags="8589938704">
 <foldFlags>15</foldFlags>
 <parameter name="X" id="1" flags="8589934608" default="0" value="-1080"/>
-<parameter name="Y" id="2" flags="8589934608" default="0" value="-881"/>
+<parameter name="Y" id="2" flags="8589934608" default="0" value="-1181"/>
 </parameter>
 <parameter name="Scale" id="105" flags="8589938704">
 <foldFlags>15</foldFlags>

@@ -365,10 +365,10 @@ def variants(b):
 
 # ---------------- vertical (9:16) ----------------
 # A vertical copy of each layout for Shorts/Reels/TikTok: same design on a 2160x3840 canvas,
-# moved in from the left edge and up past the captions and buttons those apps draw over the
-# bottom ~880 px and the right ~220 px.
+# kept clear of the button column those apps draw down the right ~220 px, and sitting
+# ~580 px (15%) above the bottom edge.
 V_SIZE = (2160, 3840)
-V_DX, V_DY = 570, -156  # logo ~100 px from the left edge, graphic bottom ~880 px up
+V_DX, V_DY = 570, -456  # logo ~100 px from the left edge, graphic bottom ~580 px up
 V_RIGHT = 860           # plates stop here, clear of the right-hand button column
 
 
@@ -376,7 +376,7 @@ def vertical(v):
     v = copy.deepcopy(v)
     v["title"] += " Vertical"
     v["size"] = V_SIZE
-    v["preview_crop"] = (0, 2300, 2160, 3200)
+    v["preview_crop"] = (0, 2144 - V_DY, 2160, 3044 - V_DY)
     (lx, ly), sc = v["logo"]
     v["logo"] = ((lx + V_DX, ly + V_DY), sc)
     v["text_x"] += V_DX
