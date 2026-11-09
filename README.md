@@ -25,6 +25,19 @@ Every template has:
 - Build In / Build Out markers, so FCP only stretches the hold when you trim
 - 4K / 59.94 fps
 
+## Previews
+
+Mockups of the current builds (drawn by the script, not rendered by Motion), from `previews/`:
+
+| | NYLT | FOS 27 |
+|---|---|---|
+| Pro | ![](previews/nylt/pro.png) | ![](previews/fos27/pro.png) |
+| Bar | ![](previews/nylt/bar.png) | ![](previews/fos27/bar.png) |
+| Stacked | ![](previews/nylt/stacked.png) | ![](previews/fos27/stacked.png) |
+| Pro Vertical | ![](previews/nylt/pro-vertical.png) | ![](previews/fos27/pro-vertical.png) |
+| Bar Vertical | ![](previews/nylt/bar-vertical.png) | ![](previews/fos27/bar-vertical.png) |
+| Stacked Vertical | ![](previews/nylt/stacked-vertical.png) | ![](previews/fos27/stacked-vertical.png) |
+
 ## Brands
 
 | Folder | Templates | Final Cut category |
@@ -64,7 +77,8 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 ```
 
 By default, templates go into `~/Movies/Motion Templates.localized/Titles.localized/<category>/`.
-Restart Final Cut Pro afterwards so it picks them up. Previews are written to `previews/<brand>/`.
+Restart Final Cut Pro afterwards so it picks them up. Previews are written to `previews/<brand>/`
+and checked in, so commit them along with any rebuilt templates.
 
 **Close the templates in Motion before re-running.** The script replaces the output folders, and
 saving a stale copy from Motion would undo the rebuild.
